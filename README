@@ -1,4 +1,4 @@
-Mail-SpamFilter version 0.06
+Mail-SpamFilter version 0.08
 ============================
 
 Provides a convenient interface for several spam filters.
@@ -28,7 +28,7 @@ Currently provides interfaces for the following filters:
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2004 by Martin Ward
+Copyright (C) 2004 by Martin Ward <martin@gkc.org.uk>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.1 or,

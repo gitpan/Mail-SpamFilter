@@ -32,12 +32,12 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
-my $HOME = $ENV{'HOME'} || $ENV{'LOGDIR'} ||
-                (getpwuid($<))[7] || die "You're homeless!\n";
-my $USER = $ENV{'USER'} || getlogin ||
-                (getpwuid($<))[0] || die "You're nameless!\n";
+my $HOME = $ENV{'HOME'} || $ENV{'LOGDIR'} || $ENV{'USERPROFILE'} ||
+                die "You're homeless!\n";
+my $USER = $ENV{'USER'} || $ENV{'LOGNAME'} || $ENV{'USERNAME'} ||
+                getlogin || die "You're nameless!\n";
 
 
 # Table of spam filters and the tags they produce that we are interested in:
@@ -47,7 +47,10 @@ our %FILTER_TAGS = (
   spamassassin	=> [qw(X-Spam-Level
 		       X-Spam-Status)],
 
-  crm114	=> [qw(X-CRM114-Status)],
+  crm114	=> [qw(X-CRM114-Status
+		       X-CRM114-Version
+		       X-CRM114-CacheID
+		       X-CRM114-Notice)],
 
   wpbl		=> [qw(X-WPBL)],
 
@@ -89,7 +92,7 @@ our %FILTER_GOOD_TAG = (
 
   spamassassin	=> qr/X-Spam-Status: No/,
 
-  crm114	=> qr/X-CRM114-Status: Good/,
+  crm114	=> qr/X-CRM114-Status: (Good|UNSURE)/,
 
   wpbl		=> qr/X-WPBL: OK/,
 
@@ -112,7 +115,7 @@ our %FILTER_CMD = (
 
   spamassassin	=> "spamassassin",
 
-  crm114	=> "crm -u $HOME/.crm114 mailfilter.crm",
+  crm114	=> "crm -u $HOME/.crm114 mailreaver.crm",
 
   wpbl		=> "wpbl_check",
 
@@ -120,7 +123,7 @@ our %FILTER_CMD = (
 
   spamprobe	=> "spamprobe_check",
 
-  bogofilter	=> "bogofilter -pue",
+  bogofilter	=> "bogofilter -pe",
 
   spamhaus_zen	=> "spamhaus_zen_check",
 
@@ -133,7 +136,7 @@ our %ISSPAM_CMD = (
 
   spamassassin	=> "spamassassin --report",
 
-  crm114	=> "crm -u $HOME/.crm114 mailfilter.crm --learnspam",
+  crm114	=> "crm -u $HOME/.crm114 mailreaver.crm --spam",
 
   wpbl		=> "wpbl spam",
 
@@ -152,7 +155,7 @@ our %NOTSPAM_CMD = (
 
   spamassassin	=> "spamassassin --revoke",
 
-  crm114	=> "crm -u $HOME/.crm114 mailfilter.crm --learnnonspam",
+  crm114	=> "crm -u $HOME/.crm114 mailreaver.crm --good",
 
   wpbl		=> "wpbl good",
 
@@ -174,6 +177,13 @@ our @EXTRA_TAGS = (
   qr/X-(\w+)-MailScanner-SpamScore/,
 
   qr/X-(\w+)-MailScanner-SpamCheck/,
+
+  qr/Status/,
+
+  qr/X-Status/,
+
+  qr/X-KMail-(\S+)/,
+
 );
 
 
@@ -384,7 +394,7 @@ http://www.spamhaus.org/ZEN/		Spamhaus ZEN DNSBL
 
 =head1 AUTHOR
 
-Martin Ward, E<lt>Martin.Ward@durham.ac.ukE<gt>
+Martin Ward, E<lt>martin@gkc.org.uk<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

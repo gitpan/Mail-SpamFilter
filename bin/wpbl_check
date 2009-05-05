@@ -39,13 +39,13 @@ my $HOME = $ENV{'HOME'} || $ENV{'LOGDIR'} ||
 my $base = "$HOME/.wpbl";
 my $exclude = "$base/data/exclude";
 my $blocks  = "$base/data/wpbl-blocks.cidr";
-my $source  = "rsync://dnsbl.net.au/wpbl-anon/wpbl-blocks.cidr";
+my $source  = "rsync://rsync.wpbl.info/wpbl/wpbl-blocks.cidr";
 
 undef $/;
 
 # If $blocks is older than 0.042 days (just over one hour), then re-fetch it:
 if (-M $blocks > 0.042) {
-  system "rsync -q $source $blocks";
+  system "rsync -q -z $source $blocks";
   # In case the rsync failed, touch the file so that we won't try to fetch
   # it again for another hour at least:
   system "touch $blocks";
@@ -77,7 +77,7 @@ foreach my $log (grep { /^log/ } readdir (DIR)) {
   my @spam = grep { /^spam\s+\d+\.\d+\.\d+\.\d+/ } split(/\n/, <IN>);
   close(IN);
   s/^spam (\d+\.\d+\.\d+\.\d+)\s*/$1/ for (@spam);
-  @block = (@block, @spam);
+  push(@block, @spam);
 }
 
 

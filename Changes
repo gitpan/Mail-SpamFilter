@@ -22,3 +22,6 @@ Revision history for Perl extension Mail::SpamFilter.
 	- Cleaned up and added entries for spamhaus_zen_check:
 	  http://www.spamhaus.org/ZEN/
 
+0.08  Tue May  5 11:38:09 BST 2009
+	- Fixes for Windows
+
